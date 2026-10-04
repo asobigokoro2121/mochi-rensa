@@ -1005,8 +1005,8 @@ function startParade(B){
 
 /* ================= CPU ================= */
 const AI = {
-  weak:   {think:.6,  act:.2,   fireAt:1, potW:0,  connW:1,   noise:90, drop:'soft'},
-  normal: {think:.32, act:.11,  fireAt:3, potW:45, connW:2.5, noise:10, drop:'soft'},
+  weak:   {think:.42, act:.15,  fireAt:2, potW:32, connW:2.1, noise:24, drop:'soft'},
+  normal: {think:.38, act:.13,  fireAt:3, potW:38, connW:2.3, noise:20, drop:'soft'},
   strong: {think:.14, act:.055, fireAt:5, potW:75, connW:3,   noise:2,  drop:'hard'},
 };
 function simDrop(g, x, r, a, b){
@@ -1063,7 +1063,7 @@ function connectivity(g){
   return sum;
 }
 function chooseMove(B){
-  const prm = AI[G.cpu], p = B.piece, g = B.grid;
+  const prm = AI[B.lvl || G.cpu], p = B.piece, g = B.grid;
   const hb = heights(g), danger = Math.max(...hb) >= 9 || hb[2] >= 8;
   let best = null;
   for (let x = 0; x < COLS; x++) for (let r = 0; r < 4; r++) {
@@ -1092,14 +1092,14 @@ function chooseMove(B){
   return best || {x:2, r:0};
 }
 function planAI(B){
-  const prm = AI[G.cpu], mv = chooseMove(B);
+  const prm = AI[B.lvl || G.cpu], mv = chooseMove(B);
   B.ai = {delay:prm.think * (.7 + Math.random() * .6), tx:mv.x, tr:mv.r, soft:false, steps:0};
 }
 function aiStep(B, dt){
   const ai = B.ai, p = B.piece;
   if (!ai || !p || B.phase !== 'drop') return;
   ai.delay -= dt; if (ai.delay > 0) return;
-  const prm = AI[G.cpu];
+  const prm = AI[B.lvl || G.cpu];
   ai.delay = prm.act;
   if (++ai.steps > 40) { hardDrop(B); return; }
   if (p.r !== ai.tr) { rotate(B, ((ai.tr - p.r + 4) % 4) === 3 ? -1 : 1); return; }
